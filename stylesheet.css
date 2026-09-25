@@ -2,7 +2,7 @@
 
 .gemini-popup-box {
   padding: 8px 12px;
-  min-width: 290px;
+  min-width: 320px;
 }
 
 .gemini-header-box {
@@ -31,12 +31,21 @@
   color: #f87171;
 }
 
+/* Cards */
 .gemini-card {
   background-color: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 10px 12px;
   margin-bottom: 10px;
+}
+
+.gemini-card-hrow {
+  margin-bottom: 4px;
+}
+
+.gemini-card-info {
+  padding-left: 12px;
 }
 
 .gemini-card-header {
@@ -45,12 +54,12 @@
 
 .gemini-card-title {
   font-weight: 600;
-  font-size: 0.95em;
+  font-size: 0.98em;
 }
 
 .gemini-card-percent {
   font-weight: bold;
-  font-size: 1.05em;
+  font-size: 1.1em;
   color: #38bdf8;
 }
 
@@ -62,10 +71,25 @@
   color: #f87171;
 }
 
+/* Donut Torus Styles */
+.gemini-donut-stack {
+  width: 60px;
+  height: 60px;
+}
+
+.gemini-donut-center-text {
+  font-weight: bold;
+  font-size: 0.82em;
+  color: #f1f5f9;
+  text-align: center;
+}
+
+/* Horizontal Bar Styles */
 .gemini-bar-track {
   height: 8px;
   border-radius: 4px;
   background-color: rgba(255, 255, 255, 0.12);
+  margin-top: 6px;
   margin-bottom: 6px;
   overflow: hidden;
 }
@@ -90,9 +114,10 @@
 }
 
 .gemini-card-reset {
-  font-size: 0.82em;
+  font-size: 0.84em;
   color: #a78bfa;
   font-weight: 500;
+  margin-top: 2px;
 }
 
 .gemini-footer {
@@ -103,4 +128,21 @@
 .gemini-footer-text {
   font-size: 0.78em;
   color: rgba(255, 255, 255, 0.5);
+}
+
+/* Panel Donut Rings */
+.gemini-panel-donuts {
+  spacing: 4px;
+  margin-left: 2px;
+  margin-right: 4px;
+}
+
+.gemini-panel-donut-item {
+  spacing: 2px;
+}
+
+.gemini-panel-donut-label {
+  font-size: 0.72em;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 600;
 }
