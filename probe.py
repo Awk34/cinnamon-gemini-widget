@@ -28,7 +28,7 @@ def format_time_delta(seconds: int) -> str:
         return f"{minutes}m"
 
 def get_quota_from_language_server():
-    # 1. Discover language_server or agy process
+    # Discover language_server or agy process
     target_pid = None
     csrf_token = None
 
@@ -76,10 +76,10 @@ def get_quota_from_language_server():
             "hint": "Open Antigravity IDE or run the agy CLI."
         }
 
-    # 2. Discover listening TCP ports for target_pid
+    # Discover listening TCP ports for target_pid
     ports = []
     # Fast lookup via /proc/net/tcp and /proc/net/tcp6
-    # Or using ss
+    # or using ss
     try:
         ss_out = subprocess.run(["ss", "-tlnp"], capture_output=True, text=True, timeout=2.0)
         for row in ss_out.stdout.split("\n"):
@@ -107,7 +107,7 @@ def get_quota_from_language_server():
             "error": f"No listening ports found for language server (PID {target_pid})."
         }
 
-    # 3. Query the local RPC endpoint
+    # Query the local RPC endpoint
     ctx = ssl.create_default_context()
     ctx.check_hostname = False
     ctx.verify_mode = ssl.CERT_NONE

@@ -17,14 +17,17 @@ usage() {
 do_install() {
     echo "Installing Gemini Quota Applet to $APPLET_DIR..."
     mkdir -p "$APPLET_DIR"
-    cp -u "$SCRIPT_DIR/metadata.json" "$APPLET_DIR/"
-    cp -u "$SCRIPT_DIR/applet.js" "$APPLET_DIR/"
-    cp -u "$SCRIPT_DIR/stylesheet.css" "$APPLET_DIR/"
-    cp -u "$SCRIPT_DIR/settings-schema.json" "$APPLET_DIR/"
-    cp -u "$SCRIPT_DIR/probe.py" "$APPLET_DIR/"
-    cp -u "$SCRIPT_DIR/icon.svg" "$APPLET_DIR/"
-    cp -u "$SCRIPT_DIR/icon.png" "$APPLET_DIR/"
+    cp -f "$SCRIPT_DIR/metadata.json" "$APPLET_DIR/"
+    cp -f "$SCRIPT_DIR/applet.js" "$APPLET_DIR/"
+    cp -f "$SCRIPT_DIR/stylesheet.css" "$APPLET_DIR/"
+    cp -f "$SCRIPT_DIR/settings-schema.json" "$APPLET_DIR/"
+    cp -f "$SCRIPT_DIR/probe.py" "$APPLET_DIR/"
+    cp -f "$SCRIPT_DIR/icon.svg" "$APPLET_DIR/"
+    cp -f "$SCRIPT_DIR/icon.png" "$APPLET_DIR/"
     chmod +x "$APPLET_DIR/probe.py"
+
+    # Reload in Cinnamon if already running
+    gdbus call --session --dest org.Cinnamon --object-path /org/Cinnamon --method org.Cinnamon.ReloadXlet "$UUID" "APPLET" >/dev/null 2>&1 || true
 
     echo "Applet files installed successfully!"
     echo "You can add it via System Settings -> Applets -> 'Gemini AI Quota'."

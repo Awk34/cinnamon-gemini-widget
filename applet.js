@@ -160,7 +160,7 @@ class GeminiQuotaApplet extends Applet.TextIconApplet {
         // Configure Action
         let settingsItem = new PopupMenu.PopupIconMenuItem("Configure...", "preferences-system-symbolic", St.IconType.SYMBOLIC);
         settingsItem.connect("activate", () => {
-            Util.spawnCommandLine("cinnamon-settings applets " + UUID + " " + this.instance_id);
+            this.configureApplet();
         });
         this.menu.addMenuItem(settingsItem);
     }
