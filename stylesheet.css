@@ -1,0 +1,106 @@
+/* Gemini AI Quota Cinnamon Applet Stylesheet */
+
+.gemini-popup-box {
+  padding: 8px 12px;
+  min-width: 290px;
+}
+
+.gemini-header-box {
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  margin-bottom: 10px;
+}
+
+.gemini-header-title {
+  font-weight: bold;
+  font-size: 1.15em;
+  color: #60a5fa;
+}
+
+.gemini-status-badge {
+  font-size: 0.8em;
+  padding: 2px 7px;
+  border-radius: 9px;
+  background-color: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  font-weight: 600;
+}
+
+.gemini-status-badge.offline {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+}
+
+.gemini-card {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+}
+
+.gemini-card-header {
+  margin-bottom: 6px;
+}
+
+.gemini-card-title {
+  font-weight: 600;
+  font-size: 0.95em;
+}
+
+.gemini-card-percent {
+  font-weight: bold;
+  font-size: 1.05em;
+  color: #38bdf8;
+}
+
+.gemini-card-percent.warning {
+  color: #fbbf24;
+}
+
+.gemini-card-percent.critical {
+  color: #f87171;
+}
+
+.gemini-bar-track {
+  height: 8px;
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.12);
+  margin-bottom: 6px;
+  overflow: hidden;
+}
+
+.gemini-bar-fill {
+  height: 8px;
+  border-radius: 4px;
+  background-color: #38bdf8;
+}
+
+.gemini-bar-fill.warning {
+  background-color: #fbbf24;
+}
+
+.gemini-bar-fill.critical {
+  background-color: #ef4444;
+}
+
+.gemini-card-subtitle {
+  font-size: 0.82em;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.gemini-card-reset {
+  font-size: 0.82em;
+  color: #a78bfa;
+  font-weight: 500;
+}
+
+.gemini-footer {
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.gemini-footer-text {
+  font-size: 0.78em;
+  color: rgba(255, 255, 255, 0.5);
+}

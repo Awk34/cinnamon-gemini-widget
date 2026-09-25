@@ -1,0 +1,91 @@
+{
+  "layout": {
+    "pages": ["page_display", "page_alerts"],
+    "page_display": {
+      "type": "page",
+      "title": "Display",
+      "sections": ["section_panel", "section_refresh"]
+    },
+    "page_alerts": {
+      "type": "page",
+      "title": "Alerts & Limits",
+      "sections": ["section_thresholds"]
+    },
+    "section_panel": {
+      "type": "section",
+      "title": "Panel Appearance",
+      "keys": ["displayMode", "showIcon", "showPrefix"]
+    },
+    "section_refresh": {
+      "type": "section",
+      "title": "Update Frequency",
+      "keys": ["refreshInterval"]
+    },
+    "section_thresholds": {
+      "type": "section",
+      "title": "Thresholds & Notifications",
+      "keys": ["warningThreshold", "criticalThreshold", "enableNotifications"]
+    }
+  },
+  "displayMode": {
+    "type": "combobox",
+    "default": "both",
+    "description": "Panel Label Style",
+    "options": {
+      "5h: 85% | W: 90%": "both",
+      "85% | 90% (compact)": "compact",
+      "5h: 85% only": "five_hour",
+      "W: 90% only": "weekly",
+      "Icon only": "icon_only"
+    },
+    "tooltip": "Choose how the quota percentages appear on your Cinnamon panel."
+  },
+  "showIcon": {
+    "type": "checkbox",
+    "default": true,
+    "description": "Show Gemini sparkle icon in panel",
+    "tooltip": "Toggle the panel icon on or off."
+  },
+  "showPrefix": {
+    "type": "checkbox",
+    "default": false,
+    "description": "Show 'Gemini:' prefix on panel label",
+    "tooltip": "Prepend 'Gemini:' to the panel text."
+  },
+  "refreshInterval": {
+    "type": "spinbutton",
+    "default": 60,
+    "min": 15,
+    "max": 600,
+    "step": 15,
+    "units": "seconds",
+    "description": "Refresh Interval",
+    "tooltip": "How frequently to probe for updated quota numbers."
+  },
+  "warningThreshold": {
+    "type": "spinbutton",
+    "default": 20,
+    "min": 5,
+    "max": 50,
+    "step": 5,
+    "units": "%",
+    "description": "Warning Threshold",
+    "tooltip": "Change text or highlight color to amber when quota falls below this level."
+  },
+  "criticalThreshold": {
+    "type": "spinbutton",
+    "default": 10,
+    "min": 1,
+    "max": 25,
+    "step": 1,
+    "units": "%",
+    "description": "Critical Threshold",
+    "tooltip": "Change text or highlight color to red when quota falls below this level."
+  },
+  "enableNotifications": {
+    "type": "checkbox",
+    "default": true,
+    "description": "Notify when quota crosses below warning threshold",
+    "tooltip": "Send a desktop notification when remaining quota is low."
+  }
+}
