@@ -1,5 +1,6 @@
 {
   "layout": {
+    "type": "layout",
     "pages": ["page_display", "page_alerts"],
     "page_display": {
       "type": "page",
