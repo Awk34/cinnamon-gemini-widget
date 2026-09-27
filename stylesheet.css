@@ -132,17 +132,7 @@
 
 /* Panel Donut Rings */
 .gemini-panel-donuts {
-  spacing: 4px;
-  margin-left: 2px;
-  margin-right: 4px;
-}
-
-.gemini-panel-donut-item {
-  spacing: 2px;
-}
-
-.gemini-panel-donut-label {
-  font-size: 0.72em;
-  color: rgba(255, 255, 255, 0.7);
-  font-weight: 600;
+  spacing: 6px;
+  margin-left: 3px;
+  margin-right: 5px;
 }

@@ -2,6 +2,8 @@ const Applet = imports.ui.applet;
 const PopupMenu = imports.ui.popupMenu;
 const St = imports.gi.St;
 const Clutter = imports.gi.Clutter;
+const Pango = imports.gi.Pango;
+const PangoCairo = imports.gi.PangoCairo;
 const GLib = imports.gi.GLib;
 const Gio = imports.gi.Gio;
 const Cairo = imports.cairo;
@@ -23,7 +25,15 @@ function getQuotaColor(percentage, warnThresh = 20, critThresh = 10) {
   }
 }
 
-function drawTorusRing(area, fraction, colorRGBA, lineWidth = 5.5) {
+function drawTorusRing(
+  area,
+  fraction,
+  colorRGBA,
+  lineWidth = 5.5,
+  centerText = null,
+  textColor = null,
+  fontDescStr = null,
+) {
   let cr = area.get_context();
   let [width, height] = area.get_surface_size();
   if (width <= 0 || height <= 0) {
@@ -33,11 +43,11 @@ function drawTorusRing(area, fraction, colorRGBA, lineWidth = 5.5) {
 
   let cx = width / 2;
   let cy = height / 2;
-  let radius = Math.min(cx, cy) - lineWidth / 2 - 1.5;
+  let radius = Math.min(cx, cy) - lineWidth / 2 - 1.2;
   if (radius < 1) radius = 1;
 
   // 1. Background ring track
-  cr.setSourceRGBA(1.0, 1.0, 1.0, 0.12);
+  cr.setSourceRGBA(1.0, 1.0, 1.0, 0.15);
   cr.setLineWidth(lineWidth);
   cr.arc(cx, cy, radius, 0, 2 * Math.PI);
   cr.stroke();
@@ -53,6 +63,28 @@ function drawTorusRing(area, fraction, colorRGBA, lineWidth = 5.5) {
     cr.setLineCap(Cairo.LineCap.ROUND);
     cr.arc(cx, cy, radius, startAngle, endAngle);
     cr.stroke();
+  }
+
+  // 3. Optional Center Text (e.g. "5h" and "W")
+  if (centerText) {
+    let layout = PangoCairo.create_layout(cr);
+    let fontStr =
+      fontDescStr || (width >= 24 ? "Sans Bold 7" : "Sans Bold 6");
+    layout.set_font_description(Pango.FontDescription.from_string(fontStr));
+    layout.set_text(centerText, -1);
+
+    let [textWidth, textHeight] = layout.get_pixel_size();
+    let tx = cx - textWidth / 2;
+    let ty = cy - textHeight / 2;
+
+    if (textColor) {
+      cr.setSourceRGBA(textColor.r, textColor.g, textColor.b, 1.0);
+    } else {
+      cr.setSourceRGBA(0.95, 0.96, 0.98, 0.95);
+    }
+
+    cr.moveTo(tx, ty);
+    PangoCairo.show_layout(cr, layout);
   }
 
   cr.$dispose();
@@ -143,55 +175,48 @@ class GeminiQuotaApplet extends Applet.TextIconApplet {
       y_align: Clutter.ActorAlign.CENTER,
     });
 
-    // 5-Hour Panel Donut Item
-    let item5h = new St.BoxLayout({
-      vertical: false,
-      style_class: "gemini-panel-donut-item",
-      y_align: Clutter.ActorAlign.CENTER,
-    });
+    let panelSize = Math.min(
+      26,
+      Math.max(20, Math.round((this._panelHeight || 40) * 0.65)),
+    );
+
+    // 5-Hour Panel Donut (with '5h' inside)
     this._panel5hArea = new St.DrawingArea({
-      width: 22,
-      height: 22,
+      width: panelSize,
+      height: panelSize,
       y_align: Clutter.ActorAlign.CENTER,
     });
     this._panel5hFraction = 1.0;
     this._panel5hColor = getQuotaColor(100);
     this._panel5hArea.connect("repaint", (area) => {
-      drawTorusRing(area, this._panel5hFraction, this._panel5hColor, 3.2);
+      drawTorusRing(
+        area,
+        this._panel5hFraction,
+        this._panel5hColor,
+        2.6,
+        "5h",
+      );
     });
-    let label5h = new St.Label({
-      text: "5h",
-      style_class: "gemini-panel-donut-label",
-      y_align: Clutter.ActorAlign.CENTER,
-    });
-    item5h.add_actor(this._panel5hArea);
-    item5h.add_actor(label5h);
-    this._panelDonutsBox.add_actor(item5h);
+    this._panelDonutsBox.add_actor(this._panel5hArea);
 
-    // Weekly Panel Donut Item
-    let itemWk = new St.BoxLayout({
-      vertical: false,
-      style_class: "gemini-panel-donut-item",
-      y_align: Clutter.ActorAlign.CENTER,
-    });
+    // Weekly Panel Donut (with 'W' inside)
     this._panelWkArea = new St.DrawingArea({
-      width: 22,
-      height: 22,
+      width: panelSize,
+      height: panelSize,
       y_align: Clutter.ActorAlign.CENTER,
     });
     this._panelWkFraction = 1.0;
     this._panelWkColor = getQuotaColor(100);
     this._panelWkArea.connect("repaint", (area) => {
-      drawTorusRing(area, this._panelWkFraction, this._panelWkColor, 3.2);
+      drawTorusRing(
+        area,
+        this._panelWkFraction,
+        this._panelWkColor,
+        2.6,
+        "W",
+      );
     });
-    let labelWk = new St.Label({
-      text: "W",
-      style_class: "gemini-panel-donut-label",
-      y_align: Clutter.ActorAlign.CENTER,
-    });
-    itemWk.add_actor(this._panelWkArea);
-    itemWk.add_actor(labelWk);
-    this._panelDonutsBox.add_actor(itemWk);
+    this._panelDonutsBox.add_actor(this._panelWkArea);
 
     // Add to applet actor (before label)
     this.actor.add(this._panelDonutsBox, {
