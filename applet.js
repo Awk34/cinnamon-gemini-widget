@@ -176,7 +176,12 @@ class GeminiQuotaApplet extends Applet.TextIconApplet {
 
     // Setup Applet UI
     this._apply_icon();
-    if (this.displayMode === "icon_only" || this.displayMode === "donuts_only") {
+    let initialMode = this.displayMode || "donuts_only";
+    const showDonuts =
+      initialMode === "donuts_and_text" || initialMode === "donuts_only";
+    this._panelDonutsBox[showDonuts ? "show" : "hide"]();
+
+    if (initialMode === "icon_only" || initialMode === "donuts_only") {
       this.set_applet_label("");
     } else {
       this.set_applet_label("Loading...");
@@ -510,8 +515,8 @@ class GeminiQuotaApplet extends Applet.TextIconApplet {
 
   _on_error(errorMsg) {
     this._apply_icon();
-    let mode = this.displayMode || "both";
-    if (mode === "icon_only") {
+    let mode = this.displayMode || "donuts_only";
+    if (mode === "icon_only" || mode === "donuts_only") {
       this.set_applet_label("");
     } else {
       let label = "Offline";
@@ -521,7 +526,29 @@ class GeminiQuotaApplet extends Applet.TextIconApplet {
     this.set_applet_tooltip("Gemini AI Quota: " + errorMsg);
 
     if (this._panelDonutsBox) {
-      this._panelDonutsBox.hide();
+      if (mode === "donuts_and_text" || mode === "donuts_only") {
+        this._panel5h.state.fraction = 0;
+        this._panel5h.state.color = {
+          r: 0.45,
+          g: 0.45,
+          b: 0.45,
+          hex: "#71717a",
+          name: "offline",
+        };
+        this._panel5h.area.queue_repaint();
+        this._panelWk.state.fraction = 0;
+        this._panelWk.state.color = {
+          r: 0.45,
+          g: 0.45,
+          b: 0.45,
+          hex: "#71717a",
+          name: "offline",
+        };
+        this._panelWk.area.queue_repaint();
+        this._panelDonutsBox.show();
+      } else {
+        this._panelDonutsBox.hide();
+      }
     }
 
     if (this.statusBadge) {
@@ -601,7 +628,7 @@ class GeminiQuotaApplet extends Applet.TextIconApplet {
     let colorWk = getQuotaColor(pwk, warnThresh, critThresh);
 
     // 1. Update Panel Display
-    let mode = this.displayMode || "both";
+    let mode = this.displayMode || "donuts_only";
     const showDonuts = mode === "donuts_and_text" || mode === "donuts_only";
     this._panelDonutsBox[showDonuts ? "show" : "hide"]();
 

@@ -35,12 +35,12 @@
   },
   "displayMode": {
     "type": "combobox",
-    "default": "both",
+    "default": "donuts_only",
     "description": "Panel Display Style",
     "options": {
-      "5h: 85% | W: 90% (text)": "both",
-      "Donut rings and text": "donuts_and_text",
       "Donut rings only": "donuts_only",
+      "Donut rings and text": "donuts_and_text",
+      "5h: 85% | W: 90% (text)": "both",
       "85% | 90% (compact text)": "compact",
       "5h: 85% only": "five_hour",
       "W: 90% only": "weekly",
