@@ -8,12 +8,14 @@ A sleek, lightweight Cinnamon desktop panel applet that monitors your Google Gem
 
 - **Glanceable Panel Display:** Shows remaining percentages directly on your panel (e.g., `5h: 86% | W: 87%`).
 - **Interactive Popup Menu:**
-  - Visual color-coded progress bars (Normal, Amber warning, Red critical).
+  - Modern cards with circular donut/torus charts or linear progress bars.
+  - Visual color-coded indicators (Normal, Amber warning, Red critical).
   - Exact time until refresh (e.g. `Resets in 4h 38m (Fri 03:25 PM)`).
   - Live status indicator (Active / Offline).
   - One-click **Refresh Now** button.
 - **Customizable Appearance:**
-  - Multiple display modes: `5h: 85% | W: 90%`, `85% | 90% (compact)`, `5h: 85% only`, `W: 90% only`, or `Icon only`.
+  - Multiple panel display modes: standard text, donut rings with text, donut rings only, compact, 5h-only, weekly-only, or icon-only.
+  - Toggleable Gemini sparkle icon and prefix.
   - Configurable update interval (default: 60s).
   - Low-quota desktop notifications with custom thresholds.
 - **High Performance & Privacy:**
@@ -23,9 +25,35 @@ A sleek, lightweight Cinnamon desktop panel applet that monitors your Google Gem
 
 ---
 
+## Screenshots & Visual Styles
+
+### Popup Menu & Settings
+
+|    Interactive Hover / Popup Card     |         Preferences & Configuration         |
+| :-----------------------------------: | :-----------------------------------------: |
+| ![Popup Menu](pictures/hovercard.png) | ![Settings Window](pictures/settings_1.png) |
+
+### Panel Display Styles
+
+Choose how your quota is displayed directly on your Cinnamon panel:
+
+| Style                          |                        Panel Preview                         | Description                                             |
+| :----------------------------- | :----------------------------------------------------------: | :------------------------------------------------------ |
+| **Donuts with Icon (Default)** | ![Donuts with Icon](pictures/donut_rings_only_with_icon.png) | Circular progress rings with the Gemini sparkle icon    |
+| **Standard Text**              |             ![Standard Text](pictures/image.png)             | Full 5h and weekly percentages with labels              |
+| **Donut Rings & Text**         |  ![Donut Rings and Text](pictures/donut_rings_and_text.png)  | Smooth Cairo torus progress rings alongside percentages |
+| **Donut Rings Only**           |      ![Donut Rings Only](pictures/donut_rings_only.png)      | Minimalist dual circular progress rings                 |
+| **Compact Text**               |        ![Compact Text](pictures/compressed_text.png)         | Clean percentage values separated by a divider          |
+| **5-Hour Only**                |            ![5h Only](pictures/5h_only_text.png)             | Focuses solely on your active 5-hour rolling limit      |
+| **Weekly Only**                |           ![Weekly Only](pictures/w_only_text.png)           | Focuses solely on your overall weekly quota             |
+| **Icon Only**                  |             ![Icon Only](pictures/icon_only.png)             | If you only want the hovercard                          |
+
+---
+
 ## Installation
 
 ### Quick Install & Enable
+
 Run the included installation script from the project folder:
 
 ```bash
@@ -36,7 +64,9 @@ cd ~/Documents/cinnamon-gemini-widget
 This installs the applet files to `~/.local/share/cinnamon/applets/gemini-quota@antigravity` and automatically adds it to your panel.
 
 ### Manual Activation via System Settings
+
 If you prefer to add it manually:
+
 1. Run `./install.sh install`
 2. Open **System Settings** -> **Applets**
 3. Select **Gemini AI Quota**
@@ -47,9 +77,12 @@ If you prefer to add it manually:
 ## Configuration
 
 Right-click the applet in your panel and select **Configure...** to customize:
-- **Panel Label Style:** Choose between full text, compact, 5h-only, weekly-only, or icon-only.
-- **Update Frequency:** Set polling interval between 15 and 600 seconds.
-- **Thresholds & Notifications:** Set custom percentages for amber warning and red critical states, plus desktop notifications when quota runs low.
+
+- **Panel Display Style:** Choose between Standard Text, Donut Rings with Text, Donut Rings Only, Compact Text, 5h-only, Weekly-only, or Icon-only.
+- **Popup Card Style:** Choose between circular Donut/Torus charts, linear Progress Bars, or both.
+- **Panel Icon & Prefix:** Toggle the Gemini sparkle icon and optional `Gemini:` label prefix.
+- **Update Frequency:** Set polling interval between 15 and 600 seconds (default: 60s).
+- **Thresholds & Notifications:** Set custom warning (amber) and critical (red) thresholds, plus desktop notifications when quota runs low.
 
 ---
 
