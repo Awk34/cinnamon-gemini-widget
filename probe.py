@@ -27,6 +27,17 @@ def format_time_delta(seconds: int) -> str:
     else:
         return f"{minutes}m"
 
+def make_bucket(fraction=1.0, percentage=100, reset_time="", reset_local="", reset_seconds=0, reset_human="Full", description=""):
+    return {
+        "remaining_fraction": fraction,
+        "percentage": percentage,
+        "reset_time": reset_time,
+        "reset_local": reset_local,
+        "reset_in_seconds": reset_seconds,
+        "reset_human": reset_human,
+        "description": description,
+    }
+
 def get_quota_from_language_server():
     # Discover language_server or agy process
     target_pid = None
@@ -176,15 +187,15 @@ def get_quota_from_language_server():
                             except Exception:
                                 pass
 
-                        bucket_data = {
-                            "remaining_fraction": rem_fraction,
-                            "percentage": percent,
-                            "reset_time": reset_str,
-                            "reset_local": local_time_str,
-                            "reset_in_seconds": reset_delta,
-                            "reset_human": format_time_delta(reset_delta),
-                            "description": b.get("description", "")
-                        }
+                        bucket_data = make_bucket(
+                            fraction=rem_fraction,
+                            percentage=percent,
+                            reset_time=reset_str,
+                            reset_local=local_time_str,
+                            reset_seconds=reset_delta,
+                            reset_human=format_time_delta(reset_delta),
+                            description=b.get("description", "")
+                        )
 
                         if b_window == "5h" or "5h" in b_id:
                             quota_5h = bucket_data
@@ -198,24 +209,8 @@ def get_quota_from_language_server():
                         "pid": target_pid,
                         "timestamp": int(now_utc.timestamp()),
                         "gemini": {
-                            "five_hour": quota_5h or {
-                                "remaining_fraction": 1.0,
-                                "percentage": 100,
-                                "reset_time": "",
-                                "reset_local": "",
-                                "reset_in_seconds": 0,
-                                "reset_human": "Full",
-                                "description": ""
-                            },
-                            "weekly": quota_weekly or {
-                                "remaining_fraction": 1.0,
-                                "percentage": 100,
-                                "reset_time": "",
-                                "reset_local": "",
-                                "reset_in_seconds": 0,
-                                "reset_human": "Full",
-                                "description": ""
-                            }
+                            "five_hour": quota_5h or make_bucket(),
+                            "weekly": quota_weekly or make_bucket()
                         }
                     }
         except Exception:

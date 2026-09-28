@@ -15,13 +15,37 @@ const UUID = "gemini-quota@antigravity";
 
 function getQuotaColor(percentage, warnThresh = 20, critThresh = 10) {
   if (percentage <= critThresh) {
-    return { r: 239 / 255, g: 68 / 255, b: 68 / 255, hex: "#ef4444", name: "critical" };
+    return {
+      r: 239 / 255,
+      g: 68 / 255,
+      b: 68 / 255,
+      hex: "#ef4444",
+      name: "critical",
+    };
   } else if (percentage <= warnThresh) {
-    return { r: 245 / 255, g: 158 / 255, b: 11 / 255, hex: "#f59e0b", name: "warning" };
+    return {
+      r: 245 / 255,
+      g: 158 / 255,
+      b: 11 / 255,
+      hex: "#f59e0b",
+      name: "warning",
+    };
   } else if (percentage <= 40) {
-    return { r: 250 / 255, g: 204 / 255, b: 21 / 255, hex: "#facc15", name: "moderate" };
+    return {
+      r: 250 / 255,
+      g: 204 / 255,
+      b: 21 / 255,
+      hex: "#facc15",
+      name: "moderate",
+    };
   } else {
-    return { r: 56 / 255, g: 189 / 255, b: 248 / 255, hex: "#38bdf8", name: "healthy" };
+    return {
+      r: 56 / 255,
+      g: 189 / 255,
+      b: 248 / 255,
+      hex: "#38bdf8",
+      name: "healthy",
+    };
   }
 }
 
@@ -68,8 +92,7 @@ function drawTorusRing(
   // 3. Optional Center Text (e.g. "5h" and "W")
   if (centerText) {
     let layout = PangoCairo.create_layout(cr);
-    let fontStr =
-      fontDescStr || (width >= 24 ? "Sans Bold 7" : "Sans Bold 6");
+    let fontStr = fontDescStr || (width >= 24 ? "Sans Bold 7" : "Sans Bold 6");
     layout.set_font_description(Pango.FontDescription.from_string(fontStr));
     layout.set_text(centerText, -1);
 
@@ -180,45 +203,23 @@ class GeminiQuotaApplet extends Applet.TextIconApplet {
       Math.max(20, Math.round((this._panelHeight || 40) * 0.65)),
     );
 
-    // 5-Hour Panel Donut (with '5h' inside)
-    this._panel5hArea = new St.DrawingArea({
-      width: panelSize,
-      height: panelSize,
-      y_align: Clutter.ActorAlign.CENTER,
-    });
-    this._panel5hFraction = 1.0;
-    this._panel5hColor = getQuotaColor(100);
-    this._panel5hArea.connect("repaint", (area) => {
-      drawTorusRing(
-        area,
-        this._panel5hFraction,
-        this._panel5hColor,
-        2.6,
-        "5h",
-      );
-    });
-    this._panelDonutsBox.add_actor(this._panel5hArea);
+    const createDonut = (label) => {
+      let area = new St.DrawingArea({
+        width: panelSize,
+        height: panelSize,
+        y_align: Clutter.ActorAlign.CENTER,
+      });
+      let state = { fraction: 1.0, color: getQuotaColor(100) };
+      area.connect("repaint", (a) => {
+        drawTorusRing(a, state.fraction, state.color, 2.6, label);
+      });
+      this._panelDonutsBox.add_actor(area);
+      return { area, state };
+    };
 
-    // Weekly Panel Donut (with 'W' inside)
-    this._panelWkArea = new St.DrawingArea({
-      width: panelSize,
-      height: panelSize,
-      y_align: Clutter.ActorAlign.CENTER,
-    });
-    this._panelWkFraction = 1.0;
-    this._panelWkColor = getQuotaColor(100);
-    this._panelWkArea.connect("repaint", (area) => {
-      drawTorusRing(
-        area,
-        this._panelWkFraction,
-        this._panelWkColor,
-        2.6,
-        "W",
-      );
-    });
-    this._panelDonutsBox.add_actor(this._panelWkArea);
+    this._panel5h = createDonut("5h");
+    this._panelWk = createDonut("W");
 
-    // Add to applet actor (before label)
     this.actor.add(this._panelDonutsBox, {
       y_align: St.Align.MIDDLE,
       y_fill: false,
@@ -461,7 +462,8 @@ class GeminiQuotaApplet extends Applet.TextIconApplet {
     try {
       let proc = new Gio.Subprocess({
         argv: [python, probe],
-        flags: Gio.SubprocessFlags.STDOUT_PIPE | Gio.SubprocessFlags.STDERR_PIPE,
+        flags:
+          Gio.SubprocessFlags.STDOUT_PIPE | Gio.SubprocessFlags.STDERR_PIPE,
       });
       proc.init(null);
 
@@ -509,18 +511,46 @@ class GeminiQuotaApplet extends Applet.TextIconApplet {
       this.statusBadge.text = "Offline";
       this.statusBadge.style_class = "gemini-status-badge offline";
     }
-    if (this.card5h) {
-      this.card5h.percentLabel.text = "--%";
-      this.card5h.donutCenterLabel.text = "--%";
-      this.card5h.barFill.width = 0;
-      this.card5h.resetLabel.text = "Language server inactive";
-    }
-    if (this.cardWeekly) {
-      this.cardWeekly.percentLabel.text = "--%";
-      this.cardWeekly.donutCenterLabel.text = "--%";
-      this.cardWeekly.barFill.width = 0;
-      this.cardWeekly.resetLabel.text = "Language server inactive";
-    }
+
+    [this.card5h, this.cardWeekly].forEach((card) => {
+      if (card) {
+        card.percentLabel.text = "--%";
+        card.donutCenterLabel.text = "--%";
+        card.barFill.width = 0;
+        card.resetLabel.text = "Language server inactive";
+      }
+    });
+  }
+
+  _update_card(card, bucket, color, fraction, visualStyle) {
+    if (!card) return;
+    const totalBarWidth = 290;
+    const pct = bucket.percentage !== undefined ? bucket.percentage : 100;
+    const pctText = pct + "%";
+
+    card.percentLabel.text = pctText;
+    card.donutCenterLabel.text = pctText;
+    card.donutCenterLabel.style = "color: " + color.hex + ";";
+
+    card.donutState.fraction = fraction;
+    card.donutState.color = color;
+    card.donutArea.queue_repaint();
+
+    card.barFill.width = Math.max(4, Math.round(fraction * totalBarWidth));
+    const isSpecial = color.name !== "healthy";
+    card.barFill.style_class = isSpecial
+      ? "gemini-bar-fill " + color.name
+      : "gemini-bar-fill";
+    card.percentLabel.style_class = isSpecial
+      ? "gemini-card-percent " + color.name
+      : "gemini-card-percent";
+
+    card.donutStack[visualStyle === "bars" ? "hide" : "show"]();
+    card.barTrack[visualStyle === "donuts" ? "hide" : "show"]();
+
+    let resetStr = "Resets in " + (bucket.reset_human || "--");
+    if (bucket.reset_local) resetStr += " (" + bucket.reset_local + ")";
+    card.resetLabel.text = resetStr;
   }
 
   _update_ui() {
@@ -532,8 +562,20 @@ class GeminiQuotaApplet extends Applet.TextIconApplet {
 
     let p5h = h5.percentage !== undefined ? h5.percentage : 100;
     let pwk = wk.percentage !== undefined ? wk.percentage : 100;
-    let f5h = Math.max(0, Math.min(1.0, h5.remaining_fraction !== undefined ? h5.remaining_fraction : p5h / 100));
-    let fwk = Math.max(0, Math.min(1.0, wk.remaining_fraction !== undefined ? wk.remaining_fraction : pwk / 100));
+    let f5h = Math.max(
+      0,
+      Math.min(
+        1.0,
+        h5.remaining_fraction !== undefined ? h5.remaining_fraction : p5h / 100,
+      ),
+    );
+    let fwk = Math.max(
+      0,
+      Math.min(
+        1.0,
+        wk.remaining_fraction !== undefined ? wk.remaining_fraction : pwk / 100,
+      ),
+    );
 
     let warnThresh = this.warningThreshold || 20;
     let critThresh = this.criticalThreshold || 10;
@@ -543,57 +585,32 @@ class GeminiQuotaApplet extends Applet.TextIconApplet {
 
     // 1. Update Panel Display
     let mode = this.displayMode || "both";
-    let labelText = "";
+    const showDonuts = mode === "donuts_and_text" || mode === "donuts_only";
+    this._panelDonutsBox[showDonuts ? "show" : "hide"]();
 
-    switch (mode) {
-      case "both":
-        labelText = "5h: " + p5h + "% | W: " + pwk + "%";
-        this._panelDonutsBox.hide();
-        break;
-      case "compact":
-        labelText = p5h + "% | " + pwk + "%";
-        this._panelDonutsBox.hide();
-        break;
-      case "five_hour":
-        labelText = "5h: " + p5h + "%";
-        this._panelDonutsBox.hide();
-        break;
-      case "weekly":
-        labelText = "W: " + pwk + "%";
-        this._panelDonutsBox.hide();
-        break;
-      case "donuts_and_text":
-        labelText = "5h: " + p5h + "% | W: " + pwk + "%";
-        this._panelDonutsBox.show();
-        break;
-      case "donuts_only":
-        labelText = "";
-        this._panelDonutsBox.show();
-        break;
-      case "icon_only":
-        labelText = "";
-        this._panelDonutsBox.hide();
-        break;
-      default:
-        labelText = "5h: " + p5h + "% | W: " + pwk + "%";
-        this._panelDonutsBox.hide();
-    }
+    const labels = {
+      compact: `${p5h}% | ${pwk}%`,
+      five_hour: `5h: ${p5h}%`,
+      weekly: `W: ${pwk}%`,
+      donuts_only: "",
+      icon_only: "",
+    };
+    let labelText =
+      labels[mode] !== undefined ? labels[mode] : `5h: ${p5h}% | W: ${pwk}%`;
 
     if (this.showPrefix && labelText.length > 0) {
       labelText = "Gemini: " + labelText;
     }
-
     this.set_applet_label(labelText);
 
-    // Update Panel Donut Rings
-    if (mode === "donuts_and_text" || mode === "donuts_only") {
-      this._panel5hFraction = f5h;
-      this._panel5hColor = color5h;
-      this._panel5hArea.queue_repaint();
+    if (showDonuts) {
+      this._panel5h.state.fraction = f5h;
+      this._panel5h.state.color = color5h;
+      this._panel5h.area.queue_repaint();
 
-      this._panelWkFraction = fwk;
-      this._panelWkColor = colorWk;
-      this._panelWkArea.queue_repaint();
+      this._panelWk.state.fraction = fwk;
+      this._panelWk.state.color = colorWk;
+      this._panelWk.area.queue_repaint();
     }
 
     // 2. Update Tooltip
@@ -619,96 +636,14 @@ class GeminiQuotaApplet extends Applet.TextIconApplet {
 
     // 4. Update Cards
     let visualStyle = this.cardVisual || "donuts";
-    const totalBarWidth = 290;
-
-    // Update 5-Hour Card
-    if (this.card5h) {
-      this.card5h.percentLabel.text = p5h + "%";
-      this.card5h.donutCenterLabel.text = p5h + "%";
-      this.card5h.donutCenterLabel.style = "color: " + color5h.hex + ";";
-
-      // Donut repaint
-      this.card5h.donutState.fraction = f5h;
-      this.card5h.donutState.color = color5h;
-      this.card5h.donutArea.queue_repaint();
-
-      // Horizontal Bar
-      this.card5h.barFill.width = Math.max(4, Math.round(f5h * totalBarWidth));
-      let barCls = "gemini-bar-fill";
-      let txtCls = "gemini-card-percent";
-      if (color5h.name !== "healthy") {
-        barCls += " " + color5h.name;
-        txtCls += " " + color5h.name;
-      }
-      this.card5h.barFill.style_class = barCls;
-      this.card5h.percentLabel.style_class = txtCls;
-
-      // Visibility based on cardVisual style
-      if (visualStyle === "donuts") {
-        this.card5h.donutStack.show();
-        this.card5h.barTrack.hide();
-      } else if (visualStyle === "bars") {
-        this.card5h.donutStack.hide();
-        this.card5h.barTrack.show();
-      } else {
-        // both
-        this.card5h.donutStack.show();
-        this.card5h.barTrack.show();
-      }
-
-      let reset5Str = "Resets in " + (h5.reset_human || "--");
-      if (h5.reset_local) reset5Str += " (" + h5.reset_local + ")";
-      this.card5h.resetLabel.text = reset5Str;
-    }
-
-    // Update Weekly Card
-    if (this.cardWeekly) {
-      this.cardWeekly.percentLabel.text = pwk + "%";
-      this.cardWeekly.donutCenterLabel.text = pwk + "%";
-      this.cardWeekly.donutCenterLabel.style = "color: " + colorWk.hex + ";";
-
-      // Donut repaint
-      this.cardWeekly.donutState.fraction = fwk;
-      this.cardWeekly.donutState.color = colorWk;
-      this.cardWeekly.donutArea.queue_repaint();
-
-      // Horizontal Bar
-      this.cardWeekly.barFill.width = Math.max(4, Math.round(fwk * totalBarWidth));
-      let barCls = "gemini-bar-fill";
-      let txtCls = "gemini-card-percent";
-      if (colorWk.name !== "healthy") {
-        barCls += " " + colorWk.name;
-        txtCls += " " + colorWk.name;
-      }
-      this.cardWeekly.barFill.style_class = barCls;
-      this.cardWeekly.percentLabel.style_class = txtCls;
-
-      // Visibility based on cardVisual style
-      if (visualStyle === "donuts") {
-        this.cardWeekly.donutStack.show();
-        this.cardWeekly.barTrack.hide();
-      } else if (visualStyle === "bars") {
-        this.cardWeekly.donutStack.hide();
-        this.cardWeekly.barTrack.show();
-      } else {
-        // both
-        this.cardWeekly.donutStack.show();
-        this.cardWeekly.barTrack.show();
-      }
-
-      let resetWkStr = "Resets in " + (wk.reset_human || "--");
-      if (wk.reset_local) resetWkStr += " (" + wk.reset_local + ")";
-      this.cardWeekly.resetLabel.text = resetWkStr;
-    }
+    this._update_card(this.card5h, h5, color5h, f5h, visualStyle);
+    this._update_card(this.cardWeekly, wk, colorWk, fwk, visualStyle);
 
     // 5. Update Footer
     if (this.lastUpdatedLabel) {
       let now = new Date();
-      let hours = String(now.getHours()).padStart(2, "0");
-      let mins = String(now.getMinutes()).padStart(2, "0");
-      let secs = String(now.getSeconds()).padStart(2, "0");
-      this.lastUpdatedLabel.text =
-        "Last updated: " + hours + ":" + mins + ":" + secs;
+      let pad = (n) => String(n).padStart(2, "0");
+      this.lastUpdatedLabel.text = `Last updated: ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
     }
 
     // Threshold notifications
