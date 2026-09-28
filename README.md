@@ -1,8 +1,8 @@
-# Gemini AI Quota Widget for Cinnamon
+# Gemini AI Quota Widget (Spice) for Cinnamon
 
-A sleek, lightweight Cinnamon desktop panel applet that monitors your Google Gemini AI **5-hour rolling limit** and **weekly quota** in real time.
+A lightweight Cinnamon desktop panel applet that monitors your Google Gemini AI **5-hour rolling limit** and **weekly quota** in real time.
 
-![Gemini Quota Icon](icon.svg)
+![Donuts with Icon](pictures/donut_rings_only_with_icon.png)
 
 ## Features
 
@@ -37,16 +37,16 @@ A sleek, lightweight Cinnamon desktop panel applet that monitors your Google Gem
 
 Choose how your quota is displayed directly on your Cinnamon panel:
 
-| Style                          |                        Panel Preview                         | Description                                             |
-| :----------------------------- | :----------------------------------------------------------: | :------------------------------------------------------ |
-| **Donuts with Icon (Default)** | ![Donuts with Icon](pictures/donut_rings_only_with_icon.png) | Circular progress rings with the Gemini sparkle icon    |
-| **Standard Text**              |             ![Standard Text](pictures/image.png)             | Full 5h and weekly percentages with labels              |
-| **Donut Rings & Text**         |  ![Donut Rings and Text](pictures/donut_rings_and_text.png)  | Smooth Cairo torus progress rings alongside percentages |
-| **Donut Rings Only**           |      ![Donut Rings Only](pictures/donut_rings_only.png)      | Minimalist dual circular progress rings                 |
-| **Compact Text**               |        ![Compact Text](pictures/compressed_text.png)         | Clean percentage values separated by a divider          |
-| **5-Hour Only**                |            ![5h Only](pictures/5h_only_text.png)             | Focuses solely on your active 5-hour rolling limit      |
-| **Weekly Only**                |           ![Weekly Only](pictures/w_only_text.png)           | Focuses solely on your overall weekly quota             |
-| **Icon Only**                  |             ![Icon Only](pictures/icon_only.png)             | If you only want the hovercard                          |
+| Style                          |                        Panel Preview                         | Description                                      |
+| :----------------------------- | :----------------------------------------------------------: | :----------------------------------------------- |
+| **Donuts with Icon (Default)** | ![Donuts with Icon](pictures/donut_rings_only_with_icon.png) | Circular progress rings with the Gemini icon     |
+| **Standard Text**              |             ![Standard Text](pictures/image.png)             | 5h and weekly percentages with labels            |
+| **Donut Rings & Text**         |  ![Donut Rings and Text](pictures/donut_rings_and_text.png)  | Circular progress rings with text                |
+| **Donut Rings Only**           |      ![Donut Rings Only](pictures/donut_rings_only.png)      | Circular progress rings only                     |
+| **Compact Text**               |        ![Compact Text](pictures/compressed_text.png)         | Just percentage values separated by a divider    |
+| **5-Hour Only**                |            ![5h Only](pictures/5h_only_text.png)             | Only your active 5-hour rolling limit percentage |
+| **Weekly Only**                |           ![Weekly Only](pictures/w_only_text.png)           | Only your active weekly limit percentage         |
+| **Icon Only**                  |             ![Icon Only](pictures/icon_only.png)             | If you only want the hovercard                   |
 
 ---
 
