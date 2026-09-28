@@ -176,7 +176,11 @@ class GeminiQuotaApplet extends Applet.TextIconApplet {
 
     // Setup Applet UI
     this._apply_icon();
-    this.set_applet_label("Loading...");
+    if (this.displayMode === "icon_only" || this.displayMode === "donuts_only") {
+      this.set_applet_label("");
+    } else {
+      this.set_applet_label("Loading...");
+    }
     this.set_applet_tooltip("Gemini AI Quota: Initializing...");
 
     // Setup Popup Menu
@@ -228,8 +232,15 @@ class GeminiQuotaApplet extends Applet.TextIconApplet {
   }
 
   _apply_icon() {
-    if (this.showIcon && GLib.file_test(this.icon_path, GLib.FileTest.EXISTS)) {
+    let forceIcon = this.displayMode === "icon_only";
+    let shouldShow =
+      (this.showIcon || forceIcon) &&
+      GLib.file_test(this.icon_path, GLib.FileTest.EXISTS);
+    if (shouldShow) {
       this.set_applet_icon_path(this.icon_path);
+      if (this.show_applet_icon) {
+        this.show_applet_icon();
+      }
     } else {
       this.hide_applet_icon();
     }
@@ -498,9 +509,15 @@ class GeminiQuotaApplet extends Applet.TextIconApplet {
   }
 
   _on_error(errorMsg) {
-    let label = "Offline";
-    if (this.showPrefix) label = "Gemini: " + label;
-    this.set_applet_label(label);
+    this._apply_icon();
+    let mode = this.displayMode || "both";
+    if (mode === "icon_only") {
+      this.set_applet_label("");
+    } else {
+      let label = "Offline";
+      if (this.showPrefix) label = "Gemini: " + label;
+      this.set_applet_label(label);
+    }
     this.set_applet_tooltip("Gemini AI Quota: " + errorMsg);
 
     if (this._panelDonutsBox) {
