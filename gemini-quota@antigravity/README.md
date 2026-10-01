@@ -14,6 +14,9 @@ A lightweight Cinnamon desktop panel applet that monitors your Google Gemini AI 
   - Multiple panel display modes
   - Configurable update interval (default: 60s).
   - Optional low-quota desktop notifications with custom thresholds.
+- **Background Daemon:**
+  - Built-in systemd user daemon (`gemini-quota-daemon.service`) keeps quota accurate and computes reset projections even when Antigravity IDE is closed.
+  - One-click install/start directly from the Cinnamon Settings page or via the popup hovercard banner.
 - **Privacy:**
   - Queries the local Antigravity language server via secure loopback RPC.
   - Zero external dependencies (uses pure Python standard library & Cinnamon GJS).
@@ -72,6 +75,7 @@ Right-click the applet in your panel and select **Configure...** to customize:
 - **Panel Icon & Prefix:** Toggle the Gemini sparkle icon and optional `Gemini:` label prefix.
 - **Update Frequency:** Set polling interval between 15 and 600 seconds (default: 60s).
 - **Thresholds & Notifications:** Set custom warning (amber) and critical (red) thresholds, plus desktop notifications when quota runs low.
+- **Background Daemon:** Enable or stop the background monitor from the dedicated daemon settings tab.
 
 ---
 
@@ -83,6 +87,15 @@ Right-click the applet in your panel and select **Configure...** to customize:
 
 # Re-install files after updates
 ./install.sh install
+
+# Install / start background user daemon
+./install.sh daemon-install
+
+# Check background daemon status
+./install.sh daemon-status
+
+# Stop and remove background user daemon
+./install.sh daemon-uninstall
 
 # Remove from Cinnamon panel and delete files
 ./install.sh uninstall

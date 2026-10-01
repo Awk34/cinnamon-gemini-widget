@@ -8,26 +8,18 @@ A lightweight Cinnamon desktop panel applet that monitors your Google Gemini AI 
 
 - **Glanceable Panel Display:** Shows remaining percentages directly on your panel (e.g., `5h: 86% | W: 87%`).
 - **Interactive Popup Menu:**
-  - Modern cards with circular donut/torus charts or linear progress bars.
-  - Visual color-coded indicators (Normal, Amber warning, Red critical).
+  - Cards with circular donut/torus charts.
   - Exact time until refresh (e.g. `Resets in 4h 38m (Fri 03:25 PM)`).
-  - Live status indicator (Active / Offline).
-  - One-click **Refresh Now** button.
 - **Customizable Appearance:**
-  - Multiple panel display modes: standard text, donut rings with text, donut rings only, compact, 5h-only, weekly-only, or icon-only.
-  - Toggleable Gemini sparkle icon and prefix.
+  - Multiple panel display modes
   - Configurable update interval (default: 60s).
-  - Low-quota desktop notifications with custom thresholds.
-- **High Performance & Privacy:**
+  - Optional low-quota desktop notifications with custom thresholds.
+- **Background Daemon:**
+  - Built-in systemd user daemon (`gemini-quota-daemon.service`) keeps quota accurate and computes reset projections even when Antigravity IDE is closed.
+  - One-click install/start directly from the Cinnamon Settings page or via the popup hovercard banner.
+- **Privacy:**
   - Queries the local Antigravity language server via secure loopback RPC.
-  - Zero external npm/pip dependencies (uses pure Python standard library & Cinnamon GJS).
-  - Completely non-blocking asynchronous execution.
-
----
-
-## Screenshots & Visual Styles
-
-### Popup Menu & Settings
+  - Zero external dependencies (uses pure Python standard library & Cinnamon GJS).
 
 |    Interactive Hover / Popup Card     |         Preferences & Configuration         |
 | :-----------------------------------: | :-----------------------------------------: |
@@ -83,6 +75,7 @@ Right-click the applet in your panel and select **Configure...** to customize:
 - **Panel Icon & Prefix:** Toggle the Gemini sparkle icon and optional `Gemini:` label prefix.
 - **Update Frequency:** Set polling interval between 15 and 600 seconds (default: 60s).
 - **Thresholds & Notifications:** Set custom warning (amber) and critical (red) thresholds, plus desktop notifications when quota runs low.
+- **Background Daemon:** Enable or stop the background monitor from the dedicated daemon settings tab.
 
 ---
 
@@ -94,6 +87,15 @@ Right-click the applet in your panel and select **Configure...** to customize:
 
 # Re-install files after updates
 ./install.sh install
+
+# Install / start background user daemon
+./install.sh daemon-install
+
+# Check background daemon status
+./install.sh daemon-status
+
+# Stop and remove background user daemon
+./install.sh daemon-uninstall
 
 # Remove from Cinnamon panel and delete files
 ./install.sh uninstall

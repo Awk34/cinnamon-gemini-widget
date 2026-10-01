@@ -1,7 +1,7 @@
 {
   "layout": {
     "type": "layout",
-    "pages": ["page_display", "page_alerts"],
+    "pages": ["page_display", "page_alerts", "page_daemon"],
     "page_display": {
       "type": "page",
       "title": "Display",
@@ -11,6 +11,11 @@
       "type": "page",
       "title": "Alerts and Limits",
       "sections": ["section_thresholds"]
+    },
+    "page_daemon": {
+      "type": "page",
+      "title": "Background Daemon",
+      "sections": ["section_daemon"]
     },
     "section_panel": {
       "type": "section",
@@ -31,6 +36,16 @@
       "type": "section",
       "title": "Thresholds and Notifications",
       "keys": ["warningThreshold", "criticalThreshold", "enableNotifications"]
+    },
+    "section_daemon": {
+      "type": "section",
+      "title": "Background Daemon",
+      "keys": [
+        "daemonInfo",
+        "startDaemonButton",
+        "stopDaemonButton",
+        "uninstallDaemonButton"
+      ]
     }
   },
   "displayMode": {
@@ -106,5 +121,27 @@
     "default": true,
     "description": "Notify when quota crosses below warning threshold",
     "tooltip": "Send a desktop notification when remaining quota is low."
+  },
+  "daemonInfo": {
+    "type": "label",
+    "description": "The background daemon keeps quota updated via systemd when Antigravity IDE is closed."
+  },
+  "startDaemonButton": {
+    "type": "button",
+    "description": "Start / Enable Background Daemon",
+    "callback": "_on_start_daemon_clicked",
+    "tooltip": "Install and start systemd background service to monitor quota when Antigravity IDE is closed."
+  },
+  "stopDaemonButton": {
+    "type": "button",
+    "description": "Stop / Disable Background Daemon",
+    "callback": "_on_stop_daemon_clicked",
+    "tooltip": "Stop and disable the background service."
+  },
+  "uninstallDaemonButton": {
+    "type": "button",
+    "description": "Uninstall Background Daemon",
+    "callback": "_on_uninstall_daemon_clicked",
+    "tooltip": "Stop and completely remove the background systemd service."
   }
 }

@@ -13,7 +13,12 @@ const Util = imports.misc.util;
 
 const UUID = "gemini-quota@antigravity";
 
-function getQuotaColor(percentage, warnThresh = 20, critThresh = 10) {
+function getQuotaColor(
+  percentage,
+  moderateThreshold = 40,
+  warnThresh = 20,
+  critThresh = 10,
+) {
   if (percentage <= critThresh) {
     return {
       r: 239 / 255,
@@ -30,7 +35,7 @@ function getQuotaColor(percentage, warnThresh = 20, critThresh = 10) {
       hex: "#f59e0b",
       name: "warning",
     };
-  } else if (percentage <= 40) {
+  } else if (percentage <= moderateThreshold) {
     return {
       r: 250 / 255,
       g: 204 / 255,
@@ -317,6 +322,33 @@ class GeminiQuotaApplet extends Applet.TextIconApplet {
     this.cardWeekly = this._create_quota_card("Weekly Limit");
     this.menuContent.add_actor(this.cardWeekly.container);
 
+    // 3b. Background Daemon Banner (shown when daemon and IDE are inactive)
+    this.daemonBannerBox = new St.BoxLayout({
+      vertical: true,
+      style_class: "gemini-daemon-banner",
+    });
+    let daemonTitle = new St.Label({
+      text: "⚡ Background Sync Inactive",
+      style_class: "gemini-daemon-banner-title",
+    });
+    let daemonDesc = new St.Label({
+      text: "Install daemon to monitor quota when Antigravity IDE is closed.",
+      style_class: "gemini-daemon-banner-desc",
+    });
+    this.daemonButton = new St.Button({
+      style_class: "gemini-daemon-banner-button",
+      label: "Install & Start Daemon",
+      can_focus: true,
+    });
+    this.daemonButton.connect("clicked", () => {
+      this._on_start_daemon_clicked();
+    });
+    this.daemonBannerBox.add_actor(daemonTitle);
+    this.daemonBannerBox.add_actor(daemonDesc);
+    this.daemonBannerBox.add_actor(this.daemonButton);
+    this.menuContent.add_actor(this.daemonBannerBox);
+    this.daemonBannerBox.hide();
+
     // 4. Footer Note
     let footerBox = new St.BoxLayout({
       vertical: true,
@@ -468,6 +500,94 @@ class GeminiQuotaApplet extends Applet.TextIconApplet {
     };
   }
 
+  _on_start_daemon_clicked() {
+    if (this.daemonButton) {
+      this.daemonButton.label = "Starting Daemon...";
+    }
+    this._run_daemon_command(
+      "--install-daemon",
+      "Background daemon installed and started.",
+    );
+  }
+
+  _on_stop_daemon_clicked() {
+    if (this.daemonButton) {
+      this.daemonButton.label = "Stopping Daemon...";
+    }
+    this._run_daemon_command("--stop-daemon", "Background daemon stopped.");
+  }
+
+  _on_uninstall_daemon_clicked() {
+    if (this.daemonButton) {
+      this.daemonButton.label = "Uninstalling Daemon...";
+    }
+    this._run_daemon_command(
+      "--uninstall-daemon",
+      "Background daemon uninstalled.",
+    );
+  }
+
+  _run_daemon_command(arg, defaultMsg) {
+    let python = GLib.find_program_in_path("python3") || "/usr/bin/python3";
+    let probe = this.probe_path;
+
+    try {
+      let proc = new Gio.Subprocess({
+        argv: [python, probe, arg],
+        flags:
+          Gio.SubprocessFlags.STDOUT_PIPE | Gio.SubprocessFlags.STDERR_PIPE,
+      });
+      proc.init(null);
+
+      proc.communicate_utf8_async(null, null, (obj, res) => {
+        try {
+          let [, stdout, stderr] = proc.communicate_utf8_finish(res);
+          let msg = defaultMsg;
+          if (stdout) {
+            try {
+              let parsed = JSON.parse(stdout);
+              if (parsed.message) {
+                msg = parsed.message;
+              } else if (parsed.error) {
+                msg = "Daemon error: " + parsed.error;
+              }
+            } catch (e) {}
+          }
+          Util.spawnCommandLine(
+            "notify-send -i " +
+              this.icon_path +
+              ' "Gemini AI Quota" "' +
+              msg +
+              '"',
+          );
+        } catch (e) {
+          Util.spawnCommandLine(
+            "notify-send -i " +
+              this.icon_path +
+              ' "Gemini AI Quota" "Daemon action failed: ' +
+              e.message +
+              '"',
+          );
+        }
+        if (this.daemonButton) {
+          this.daemonButton.label = "Install & Start Daemon";
+        }
+        this._fetch_quota();
+      });
+    } catch (e) {
+      if (this.daemonButton) {
+        this.daemonButton.label = "Install & Start Daemon";
+      }
+      Util.spawnCommandLine(
+        "notify-send -i " +
+          this.icon_path +
+          ' "Gemini AI Quota" "Failed to execute daemon command: ' +
+          e.message +
+          '"',
+      );
+    }
+  }
+
   _fetch_quota() {
     if (this._is_updating) return;
     this._is_updating = true;
@@ -556,6 +676,17 @@ class GeminiQuotaApplet extends Applet.TextIconApplet {
       this.statusBadge.style_class = "gemini-status-badge offline";
     }
 
+    if (this.daemonBannerBox) {
+      this.daemonBannerBox.show();
+    }
+    if (this.daemonButton) {
+      this.daemonButton.label = "Install & Start Daemon";
+    }
+    if (this.daemonMenuItem) {
+      this.daemonMenuItem.label.text = "Install & Start Daemon";
+      this.daemonMenuItem.setIconSymbolicName("system-run-symbolic");
+    }
+
     [this.card5h, this.cardWeekly].forEach((card) => {
       if (card) {
         card.percentLabel.text = "--%";
@@ -621,11 +752,12 @@ class GeminiQuotaApplet extends Applet.TextIconApplet {
       ),
     );
 
+    let moderateThresh = this.moderateThreshold || 40;
     let warnThresh = this.warningThreshold || 20;
     let critThresh = this.criticalThreshold || 10;
 
-    let color5h = getQuotaColor(p5h, warnThresh, critThresh);
-    let colorWk = getQuotaColor(pwk, warnThresh, critThresh);
+    let color5h = getQuotaColor(p5h, moderateThresh, warnThresh, critThresh);
+    let colorWk = getQuotaColor(pwk, moderateThresh, warnThresh, critThresh);
 
     // 1. Update Panel Display
     let mode = this.displayMode || "donuts_only";
@@ -672,10 +804,42 @@ class GeminiQuotaApplet extends Applet.TextIconApplet {
       ")";
     this.set_applet_tooltip(tooltipText);
 
-    // 3. Update Status Badge
+    // 3. Update Status Badge & Daemon State
+    let isDaemonActive = Boolean(
+      this._quota_data && this._quota_data.daemon_active,
+    );
+    let isLive =
+      this._quota_data && this._quota_data.source === "local_language_server";
+
     if (this.statusBadge) {
-      this.statusBadge.text = "Active";
-      this.statusBadge.style_class = "gemini-status-badge";
+      if (isLive) {
+        this.statusBadge.text = "Live Sync";
+        this.statusBadge.style_class = "gemini-status-badge";
+      } else if (isDaemonActive) {
+        this.statusBadge.text = "Daemon (Idle)";
+        this.statusBadge.style_class = "gemini-status-badge idle";
+      } else {
+        this.statusBadge.text = "Cached (Idle)";
+        this.statusBadge.style_class = "gemini-status-badge idle";
+      }
+    }
+
+    if (this.daemonBannerBox) {
+      if (isDaemonActive) {
+        this.daemonBannerBox.hide();
+      } else {
+        this.daemonBannerBox.show();
+      }
+    }
+
+    if (this.daemonMenuItem) {
+      if (isDaemonActive) {
+        this.daemonMenuItem.label.text = "Stop Background Daemon";
+        this.daemonMenuItem.setIconSymbolicName("media-playback-stop-symbolic");
+      } else {
+        this.daemonMenuItem.label.text = "Start Background Daemon";
+        this.daemonMenuItem.setIconSymbolicName("system-run-symbolic");
+      }
     }
 
     // 4. Update Cards
@@ -711,6 +875,9 @@ class GeminiQuotaApplet extends Applet.TextIconApplet {
   }
 
   on_applet_clicked(event) {
+    if (!this.menu.isOpen) {
+      this._fetch_quota();
+    }
     this.menu.toggle();
   }
 

@@ -131,3 +131,48 @@
   margin-left: 3px;
   margin-right: 5px;
 }
+
+/* Background Daemon Hovercard Banner */
+.gemini-daemon-banner {
+  background-color: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin: 4px 0 10px 0;
+}
+
+.gemini-daemon-banner-title {
+  font-weight: 600;
+  font-size: 0.88em;
+  color: #38bdf8;
+  margin-bottom: 2px;
+}
+
+.gemini-daemon-banner-desc {
+  font-size: 0.78em;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 6px;
+}
+
+.gemini-daemon-banner-button {
+  background-color: rgba(56, 189, 248, 0.2);
+  border: 1px solid rgba(56, 189, 248, 0.45);
+  border-radius: 6px;
+  color: #ffffff;
+  padding: 5px 10px;
+  font-weight: 600;
+  font-size: 0.84em;
+  text-align: center;
+  transition-duration: 150ms;
+}
+
+.gemini-daemon-banner-button:hover {
+  background-color: rgba(56, 189, 248, 0.38);
+  border-color: rgba(56, 189, 248, 0.75);
+}
+
+.gemini-status-badge.idle {
+  background-color: rgba(234, 179, 8, 0.2);
+  color: #facc15;
+}
+

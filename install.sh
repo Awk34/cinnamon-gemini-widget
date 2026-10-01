@@ -6,12 +6,15 @@ APPLET_DIR="$HOME/.local/share/cinnamon/applets/$UUID"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 usage() {
-    echo "Usage: $0 [install|enable|uninstall|status|validate]"
-    echo "  install   : Copy applet files to ~/.local/share/cinnamon/applets/$UUID"
-    echo "  enable    : Install and add to Cinnamon panel"
-    echo "  uninstall : Remove applet from Cinnamon"
-    echo "  status    : Test probe.py and show current quota"
-    echo "  validate  : Validate adherence to Cinnamon Spices standards"
+    echo "Usage: $0 [install|enable|uninstall|status|validate|daemon-install|daemon-uninstall|daemon-status]"
+    echo "  install          : Copy applet files to ~/.local/share/cinnamon/applets/$UUID"
+    echo "  enable           : Install and add to Cinnamon panel"
+    echo "  uninstall        : Remove applet from Cinnamon"
+    echo "  status           : Test probe.py and show current quota"
+    echo "  validate         : Validate adherence to Cinnamon Spices standards"
+    echo "  daemon-install   : Install and start systemd user daemon (alias: daemon)"
+    echo "  daemon-uninstall : Stop and uninstall background user daemon"
+    echo "  daemon-status    : Check systemd status of background user daemon"
     exit 1
 }
 
@@ -56,6 +59,7 @@ do_enable() {
 
 do_uninstall() {
     echo "Removing $UUID..."
+    do_daemon_uninstall 2>/dev/null || true
     CURRENT=$(gsettings get org.cinnamon enabled-applets)
     # Remove entry from enabled-applets if present
     python3 -c "
@@ -74,6 +78,42 @@ do_status() {
         PROBE="$SCRIPT_DIR/probe.py"
     fi
     python3 "$PROBE"
+}
+
+do_daemon_install() {
+    PROBE="$APPLET_DIR/probe.py"
+    if [ ! -f "$PROBE" ]; then
+        PROBE="$SCRIPT_DIR/$UUID/files/$UUID/probe.py"
+    fi
+    if [ ! -f "$PROBE" ]; then
+        PROBE="$SCRIPT_DIR/probe.py"
+    fi
+    echo "Installing background user daemon..."
+    python3 "$PROBE" --install-daemon
+}
+
+do_daemon_uninstall() {
+    PROBE="$APPLET_DIR/probe.py"
+    if [ ! -f "$PROBE" ]; then
+        PROBE="$SCRIPT_DIR/$UUID/files/$UUID/probe.py"
+    fi
+    if [ ! -f "$PROBE" ]; then
+        PROBE="$SCRIPT_DIR/probe.py"
+    fi
+    echo "Uninstalling background user daemon..."
+    python3 "$PROBE" --uninstall-daemon
+}
+
+do_daemon_status() {
+    PROBE="$APPLET_DIR/probe.py"
+    if [ ! -f "$PROBE" ]; then
+        PROBE="$SCRIPT_DIR/$UUID/files/$UUID/probe.py"
+    fi
+    if [ ! -f "$PROBE" ]; then
+        PROBE="$SCRIPT_DIR/probe.py"
+    fi
+    python3 "$PROBE" --daemon-status
+    systemctl --user status gemini-quota-daemon.service --no-pager || true
 }
 
 do_validate() {
@@ -156,6 +196,15 @@ case "${1:-install}" in
         ;;
     status)
         do_status
+        ;;
+    daemon|daemon-install)
+        do_daemon_install
+        ;;
+    daemon-uninstall)
+        do_daemon_uninstall
+        ;;
+    daemon-status)
+        do_daemon_status
         ;;
     validate)
         do_validate
