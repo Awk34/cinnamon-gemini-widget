@@ -8,26 +8,15 @@ A lightweight Cinnamon desktop panel applet that monitors your Google Gemini AI 
 
 - **Glanceable Panel Display:** Shows remaining percentages directly on your panel (e.g., `5h: 86% | W: 87%`).
 - **Interactive Popup Menu:**
-  - Modern cards with circular donut/torus charts or linear progress bars.
-  - Visual color-coded indicators (Normal, Amber warning, Red critical).
+  - Cards with circular donut/torus charts.
   - Exact time until refresh (e.g. `Resets in 4h 38m (Fri 03:25 PM)`).
-  - Live status indicator (Active / Offline).
-  - One-click **Refresh Now** button.
 - **Customizable Appearance:**
-  - Multiple panel display modes: standard text, donut rings with text, donut rings only, compact, 5h-only, weekly-only, or icon-only.
-  - Toggleable Gemini sparkle icon and prefix.
+  - Multiple panel display modes
   - Configurable update interval (default: 60s).
-  - Low-quota desktop notifications with custom thresholds.
-- **High Performance & Privacy:**
+  - Optional low-quota desktop notifications with custom thresholds.
+- **Privacy:**
   - Queries the local Antigravity language server via secure loopback RPC.
-  - Zero external npm/pip dependencies (uses pure Python standard library & Cinnamon GJS).
-  - Completely non-blocking asynchronous execution.
-
----
-
-## Screenshots & Visual Styles
-
-### Popup Menu & Settings
+  - Zero external dependencies (uses pure Python standard library & Cinnamon GJS).
 
 |    Interactive Hover / Popup Card     |         Preferences & Configuration         |
 | :-----------------------------------: | :-----------------------------------------: |

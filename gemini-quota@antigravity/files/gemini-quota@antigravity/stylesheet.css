@@ -1,0 +1,133 @@
+/* Gemini AI Quota Cinnamon Applet Stylesheet */
+
+.gemini-popup-box {
+  padding: 8px 12px;
+  min-width: 320px;
+}
+
+.gemini-header-box {
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  margin-bottom: 10px;
+}
+
+.gemini-header-title {
+  font-weight: bold;
+  font-size: 1.15em;
+  color: #60a5fa;
+}
+
+.gemini-status-badge {
+  font-size: 0.8em;
+  padding: 2px 7px;
+  border-radius: 9px;
+  background-color: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  font-weight: 600;
+}
+
+.gemini-status-badge.offline {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+}
+
+/* Cards */
+.gemini-card {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+}
+
+.gemini-card-hrow {
+  margin-bottom: 4px;
+}
+
+.gemini-card-info {
+  padding-left: 12px;
+}
+
+.gemini-card-header {
+  margin-bottom: 6px;
+}
+
+.gemini-card-title {
+  font-weight: 600;
+  font-size: 0.98em;
+}
+
+.gemini-card-percent {
+  font-weight: bold;
+  font-size: 1.1em;
+  color: #38bdf8;
+}
+
+.gemini-card-percent.warning {
+  color: #fbbf24;
+}
+
+.gemini-card-percent.critical {
+  color: #f87171;
+}
+
+/* Donut Torus Styles */
+.gemini-donut-stack {
+  width: 60px;
+  height: 60px;
+}
+
+.gemini-donut-center-text {
+  font-weight: bold;
+  font-size: 0.82em;
+  color: #f1f5f9;
+  text-align: center;
+}
+
+/* Horizontal Bar Styles */
+.gemini-bar-track {
+  height: 8px;
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.12);
+  margin-top: 6px;
+  margin-bottom: 6px;
+  overflow: hidden;
+}
+
+.gemini-bar-fill {
+  height: 8px;
+  border-radius: 4px;
+  background-color: #38bdf8;
+}
+
+.gemini-bar-fill.warning {
+  background-color: #fbbf24;
+}
+
+.gemini-bar-fill.critical {
+  background-color: #ef4444;
+}
+
+.gemini-card-reset {
+  font-size: 0.84em;
+  color: #a78bfa;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.gemini-footer {
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.gemini-footer-text {
+  font-size: 0.78em;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Panel Donut Rings */
+.gemini-panel-donuts {
+  spacing: 6px;
+  margin-left: 3px;
+  margin-right: 5px;
+}
